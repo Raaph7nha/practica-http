@@ -1,0 +1,706 @@
+<!--
+Archivo: index.html
+Descripción: Página moderna para mostrar un grupo y verificar funcionamiento de un servidor HTTP.
+Requisitos:
+- Colocar este archivo como index.html
+- La imagen grupo.jpg debe estar en la misma carpeta
+- Compatible con Apache2/Linux
+-->
+
+ 
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+ 
+
+    <title>Grupo - Servidor HTTP Apache2</title>
+
+ 
+
+    <!-- Fuente moderna -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+ 
+
+    <!-- Librería de íconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+ 
+
+    <!-- Librería de confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+ 
+
+    <style>
+        /* =========================
+           ESTILOS GENERALES
+        ==========================*/
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+ 
+
+        body{
+            font-family:'Poppins', sans-serif;
+            background: linear-gradient(135deg, #050816, #0b132b, #111827);
+            color:white;
+            min-height:100vh;
+            overflow-x:hidden;
+        }
+
+ 
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+ 
+
+        section{
+            padding:70px 10%;
+        }
+
+ 
+
+        h1,h2,h3{
+            font-weight:700;
+        }
+
+ 
+
+        p{
+            color:#d1d5db;
+            line-height:1.7;
+        }
+
+ 
+
+        /* =========================
+           HERO SECTION
+        ==========================*/
+        .hero{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            min-height:100vh;
+        }
+
+ 
+
+        .hero-title{
+            font-size:3rem;
+            margin-bottom:20px;
+            background:linear-gradient(90deg,#00c6ff,#0072ff);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+        }
+
+ 
+
+        .image-container{
+            position:relative;
+            width:80%;
+            max-width:900px;
+            border-radius:25px;
+            overflow:hidden;
+            cursor:pointer;
+            transition:0.5s ease;
+        }
+
+ 
+
+        /* Borde brillante animado */
+        .image-container::before{
+            content:'';
+            position:absolute;
+            inset:-3px;
+            background:linear-gradient(
+                45deg,
+                #00f0ff,
+                #0072ff,
+                #8b5cf6,
+                #00f0ff
+            );
+            background-size:400%;
+            z-index:-1;
+            border-radius:25px;
+            animation:borderGlow 8s linear infinite;
+        }
+
+ 
+
+        @keyframes borderGlow{
+            0%{background-position:0 0;}
+            50%{background-position:300% 0;}
+            100%{background-position:0 0;}
+        }
+
+ 
+
+        .hero-image{
+            width:100%;
+            display:block;
+            transition:transform 0.6s ease;
+            border-radius:25px;
+        }
+
+ 
+
+        /* Zoom suave */
+        .image-container:hover .hero-image{
+            transform:scale(1.08);
+        }
+
+ 
+
+        /* Overlay con nombre del grupo */
+        .overlay{
+            position:absolute;
+            inset:0;
+            background:rgba(0,0,0,0.55);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            opacity:0;
+            transition:0.5s ease;
+        }
+
+ 
+
+        .overlay h2{
+            font-size:2.5rem;
+            color:#fff;
+            text-shadow:0 0 15px #00c6ff;
+        }
+
+ 
+
+        .image-container:hover .overlay{
+            opacity:1;
+        }
+
+ 
+
+        /* =========================
+           CONTADOR DE FECHA/HORA
+        ==========================*/
+        .clock-container{
+            margin-top:35px;
+            background:rgba(255,255,255,0.08);
+            padding:15px 25px;
+            border-radius:15px;
+            backdrop-filter:blur(10px);
+            box-shadow:0 0 20px rgba(0,0,0,0.3);
+        }
+
+ 
+
+        #clock{
+            font-size:1.2rem;
+            font-weight:600;
+            color:#00f0ff;
+        }
+
+ 
+
+        /* =========================
+           CARDS DE INTEGRANTES
+        ==========================*/
+        .members{
+            text-align:center;
+        }
+
+ 
+
+        .section-title{
+            font-size:2.5rem;
+            margin-bottom:50px;
+            color:#00c6ff;
+        }
+
+ 
+
+        .cards{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+            gap:25px;
+        }
+
+ 
+
+        .card{
+            background:rgba(255,255,255,0.05);
+            border-radius:20px;
+            padding:30px;
+            transition:0.4s ease;
+            backdrop-filter:blur(10px);
+            position:relative;
+            overflow:hidden;
+        }
+
+ 
+
+        .card:hover{
+            transform:translateY(-10px) scale(1.03);
+            box-shadow:0 10px 25px rgba(0,0,0,0.4);
+        }
+
+ 
+
+        .card i{
+            font-size:3rem;
+            margin-bottom:15px;
+        }
+
+ 
+
+        .card h3{
+            margin-bottom:10px;
+        }
+
+ 
+
+        .card p{
+            color:#cbd5e1;
+        }
+
+ 
+
+        /* Bordes personalizados */
+        .border-blue{
+            border:2px solid #00c6ff;
+        }
+
+ 
+
+        .border-green{
+            border:2px solid #22c55e;
+        }
+
+ 
+
+        .border-purple{
+            border:2px solid #a855f7;
+        }
+
+ 
+
+        .border-orange{
+            border:2px solid #f97316;
+        }
+
+ 
+
+        /* =========================
+           SERVIDOR HTTP
+        ==========================*/
+        .http-section{
+            text-align:center;
+        }
+
+ 
+
+        .http-box{
+            margin-top:30px;
+            background:rgba(255,255,255,0.05);
+            padding:40px;
+            border-radius:20px;
+            border:1px solid rgba(255,255,255,0.1);
+        }
+
+ 
+
+        /* =========================
+           BOTÓN INTERACTIVO
+        ==========================*/
+        .interactive{
+            text-align:center;
+        }
+
+ 
+
+        .magic-btn{
+            margin-top:30px;
+            padding:18px 35px;
+            border:none;
+            border-radius:15px;
+            font-size:1rem;
+            font-weight:600;
+            cursor:pointer;
+            background:linear-gradient(90deg,#00c6ff,#0072ff);
+            color:white;
+            transition:0.4s ease;
+            box-shadow:0 0 20px rgba(0,198,255,0.4);
+        }
+
+ 
+
+        .magic-btn:hover{
+            transform:scale(1.08);
+            box-shadow:0 0 30px rgba(0,198,255,0.7);
+        }
+
+ 
+
+        #successMessage{
+            margin-top:25px;
+            font-size:1.4rem;
+            color:#22c55e;
+            font-weight:700;
+            opacity:0;
+            transition:0.5s ease;
+        }
+
+ 
+
+        /* =========================
+           FOOTER
+        ==========================*/
+        footer{
+            background:#020617;
+            text-align:center;
+            padding:30px;
+            margin-top:60px;
+            border-top:1px solid rgba(255,255,255,0.1);
+        }
+
+ 
+
+        footer p{
+            color:#94a3b8;
+        }
+
+ 
+
+        /* =========================
+           RESPONSIVE
+        ==========================*/
+        @media(max-width:768px){
+
+ 
+
+            .hero-title{
+                font-size:2rem;
+            }
+
+ 
+
+            .overlay h2{
+                font-size:1.6rem;
+            }
+
+ 
+
+            section{
+                padding:60px 6%;
+            }
+        }
+
+ 
+
+    </style>
+</head>
+
+ 
+
+<body>
+
+ 
+
+    <!-- =========================
+         HERO SECTION
+    ==========================-->
+<section class="hero">
+
+ 
+
+        <h1 class="hero-title">
+            Nuestro Grupo de Trabajo
+</h1>
+
+ 
+
+        <div class="image-container">
+
+ 
+
+            <!-- Imagen principal -->
+<img src="grupo.jpg" alt="Grupo" class="hero-image">
+
+ 
+
+            <!-- Texto overlay -->
+<div class="overlay">
+<h2>Equipo de Sistemas Operativos</h2>
+</div>
+
+ 
+
+        </div>
+
+ 
+
+        <!-- Fecha y hora en tiempo real -->
+<div class="clock-container">
+<div id="clock">Cargando fecha y hora...</div>
+</div>
+
+ 
+
+    </section>
+
+ 
+
+    <!-- =========================
+         INTEGRANTES
+    ==========================-->
+<section class="members">
+
+ 
+
+        <h2 class="section-title">Integrantes del Grupo</h2>
+
+ 
+
+        <div class="cards">
+
+ 
+
+            <!-- Card 1 -->
+<div class="card border-blue">
+<i class="fa-solid fa-crown" style="color:#00c6ff;"></i>
+<h3>Integrante 1</h3>
+<p><strong>Rol:</strong> Líder</p>
+</div>
+
+ 
+
+            <!-- Card 2 -->
+<div class="card border-green">
+<i class="fa-solid fa-code" style="color:#22c55e;"></i>
+<h3>Integrante 2</h3>
+<p><strong>Rol:</strong> Desarrollador</p>
+</div>
+
+ 
+
+            <!-- Card 3 -->
+<div class="card border-purple">
+<i class="fa-solid fa-palette" style="color:#a855f7;"></i>
+<h3>Integrante 3</h3>
+<p><strong>Rol:</strong> Diseñador</p>
+</div>
+
+ 
+
+            <!-- Card 4 -->
+<div class="card border-orange">
+<i class="fa-solid fa-bug" style="color:#f97316;"></i>
+<h3>Integrante 4</h3>
+<p><strong>Rol:</strong> QA</p>
+</div>
+
+ 
+
+        </div>
+
+ 
+
+    </section>
+
+ 
+
+    <!-- =========================
+         SERVIDOR HTTP
+    ==========================-->
+<section class="http-section">
+
+ 
+
+        <h2 class="section-title">Nuestro Servidor HTTP</h2>
+
+ 
+
+        <div class="http-box">
+
+ 
+
+            <p>
+                HTTP (HyperText Transfer Protocol) es el protocolo utilizado para la comunicación entre clientes y servidores web.
+                Permite transferir páginas, imágenes y recursos a través de Internet de forma rápida y eficiente.
+</p>
+
+ 
+
+            <br>
+
+ 
+
+            <p>
+                Esta página está siendo servida mediante <strong>Apache2</strong> ejecutándose en un sistema Linux,
+                demostrando el correcto funcionamiento del servidor HTTP.
+</p>
+
+ 
+
+        </div>
+
+ 
+
+    </section>
+
+ 
+
+    <!-- =========================
+         SECCIÓN INTERACTIVA
+    ==========================-->
+<section class="interactive">
+
+ 
+
+        <h2 class="section-title">Verificar Servidor</h2>
+
+ 
+
+        <button class="magic-btn" onclick="celebrate()">
+            🚀 Verificar Funcionamiento
+</button>
+
+ 
+
+        <div id="successMessage">
+            ¡Servidor HTTP funcionando correctamente!
+</div>
+
+ 
+
+    </section>
+
+ 
+
+    <!-- =========================
+         FOOTER
+    ==========================-->
+<footer>
+
+ 
+
+        <p>
+            Universidad Ejemplo | Sistemas Operativos | 2026
+</p>
+
+ 
+
+    </footer>
+
+ 
+
+    <!-- =========================
+         JAVASCRIPT
+    ==========================-->
+<script>
+
+ 
+
+        /* ======================================
+           RELOJ EN TIEMPO REAL
+        ======================================*/
+        function updateClock(){
+
+ 
+
+            const now = new Date();
+
+ 
+
+            const options = {
+                weekday:'long',
+                year:'numeric',
+                month:'long',
+                day:'numeric',
+                hour:'2-digit',
+                minute:'2-digit',
+                second:'2-digit'
+            };
+
+ 
+
+            document.getElementById('clock').innerHTML =
+                now.toLocaleDateString('es-ES', options);
+        }
+
+ 
+
+        // Actualizar cada segundo
+        setInterval(updateClock, 1000);
+
+ 
+
+        // Ejecutar al cargar
+        updateClock();
+
+ 
+
+ 
+
+        /* ======================================
+           EFECTO CONFETTI
+        ======================================*/
+        function celebrate(){
+
+ 
+
+            // Mostrar mensaje
+            const msg = document.getElementById("successMessage");
+
+ 
+
+            msg.style.opacity = "1";
+
+ 
+
+            // Confetti izquierda
+            confetti({
+                particleCount:120,
+                spread:70,
+                origin:{x:0.2,y:0.6}
+            });
+
+ 
+
+            // Confetti derecha
+            confetti({
+                particleCount:120,
+                spread:70,
+                origin:{x:0.8,y:0.6}
+            });
+
+ 
+
+            // Fuegos artificiales centrales
+            confetti({
+                particleCount:200,
+                spread:120,
+                startVelocity:55,
+                origin:{y:0.6}
+            });
+        }
+
+ 
+
+    </script>
+
+ 
+
+</body>
+</html>
